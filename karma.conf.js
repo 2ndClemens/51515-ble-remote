@@ -25,7 +25,7 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/m5stack-ble'),
+      dir: require('path').join(__dirname, './coverage/mindstorms-ble'),
       subdir: '.',
       reporters: [
         { type: 'html' },

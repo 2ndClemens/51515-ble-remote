@@ -1,6 +1,6 @@
 ## [Demo](https://2ndclemens.github.io/51515-ble-remote/)
 
-# M5stackBle
+# mindstormsBle
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.2.4.
 
