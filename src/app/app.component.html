@@ -1,0 +1,13 @@
+<button mat-raised-button color="primary" (click)="onButtonClick()">
+  Connect
+</button>
+<button mat-raised-button color="primary" (click)="buttonOn()">On</button>
+<button mat-raised-button color="primary" (click)="buttonOff()">Off</button>
+<button mat-raised-button color="primary" (click)="buttonReset()">Reset</button>
+<div class="counter">{{ value }}</div>
+<div class="picker">
+  <color-sketch
+    [color]="backgroundColor"
+    (onChange)="backgroundColorChange($event)"
+  ></color-sketch>
+</div>
