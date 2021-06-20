@@ -12,9 +12,9 @@ export class AppComponent {
   value = '0';
 
   async onButtonClick() {
-    let serviceUuid = '6E400001-B5A3-F393-E0A9-E50E24DCCA9E';
-    let characteristicUuidTx = '6E400003-B5A3-F393-E0A9-E50E24DCCA9E';
-    let characteristicUuidRx = '6E400002-B5A3-F393-E0A9-E50E24DCCA9E';
+    let serviceUuid = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+    let characteristicUuidTx = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+    let characteristicUuidRx = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
     let device = null;
 
     try {
