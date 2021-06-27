@@ -17,7 +17,6 @@
   .example-box {
     width: 256px;
     height: 256px;
-    // border: solid 1px #ccc;
     color: rgba(0, 0, 0, 0.87);
     cursor: move;
     display: inline-flex;
@@ -46,7 +45,6 @@
     height: 512px;
     border-radius: 25%;
     max-width: 100%;
-    // border: dotted #ccc 2px;
     background-color: darkslategray;
     box-sizing: border-box;
   }

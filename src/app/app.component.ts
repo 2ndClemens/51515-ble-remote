@@ -76,15 +76,6 @@ export class AppComponent implements OnInit {
 
       if (characteristics && characteristics.length > 0) {
         this.myCharacteristic = characteristics[0];
-
-        /* console.log('Reading Characteristics...');
-        const value = await myCharacteristic.readValue();
-        const decoder = new TextDecoder('utf-8');
-        console.log(decoder.decode(value)); */
-
-        const encoder = new TextEncoder();
-        const text = 'on';
-        await this.myCharacteristic.writeValue(encoder.encode(text));
       }
 
       console.log('Getting Characteristics...');
@@ -113,12 +104,6 @@ export class AppComponent implements OnInit {
       console.log('Argh! ' + error);
     }
 
-    /* if (device) {
-      if (device.gatt?.connected) {
-        device.gatt.disconnect();
-        console.log('disconnect');
-      }
-    } */
   }
 
   async sleep(ms: any) {
@@ -169,8 +154,7 @@ export class AppComponent implements OnInit {
     }
   }
   dragMoved(e: any) {
-    // console.log(e.source.getFreeDragPosition());
-    //  this.dragPosition = e.source.getFreeDragPosition();
+
     const position = e.source.getFreeDragPosition();
     this.lStickHor = position.x - 124;
     this.rStickVer = -position.y + 124;
