@@ -17,14 +17,14 @@
   .example-box {
     width: 256px;
     height: 256px;
-    border: solid 1px #ccc;
+    // border: solid 1px #ccc;
     color: rgba(0, 0, 0, 0.87);
     cursor: move;
     display: inline-flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    background: #fff;
+    background: radial-gradient(ellipse at center, #c72223, #401111);
     border-radius: 50%;
     margin-right: 25px;
     position: relative;
@@ -47,7 +47,7 @@
     border-radius: 25%;
     max-width: 100%;
     // border: dotted #ccc 2px;
-    background-color:darkslategray;
+    background-color: darkslategray;
     box-sizing: border-box;
   }
 }
