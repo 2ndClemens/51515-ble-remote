@@ -1,10 +1,24 @@
-<button *ngIf="!device?.gatt?.connected" mat-raised-button color="primary" (click)="onButtonClick()">
+<div class="instruction" *ngIf="!device?.gatt?.connected">
+  Load and run <br />
+  <a href="https://gist.github.com/antonvh/aca9e9a32aaebe337af3fb1a6f2712aa"
+    >https://gist.github.com/antonvh/aca9e9a32aaebe337af3fb1a6f2712aa</a
+  ><br />
+  on your 51515 robot inventor then <br />click "Connect" and pair it to this
+  app.<br>This only works on chrome desktop browser and edge with chromium!
+</div>
+<br /><br />
+<button
+  *ngIf="!device?.gatt?.connected"
+  mat-raised-button
+  color="primary"
+  (click)="onButtonClick()"
+>
   Connect
 </button>
 <!--*ngIf="device?.gatt?.connected"-->
 <div *ngIf="device?.gatt?.connected">
   <!-- <button mat-raised-button color="primary" (click)="buttonOff()">Off</button> -->
- 
+
   <!-- <mat-slider min="-128" max="127" step="1" [(value)]="lStickHor"></mat-slider>
   <mat-slider min="-128" max="127" step="1" [(value)]="lStickVer"></mat-slider>
   <mat-slider min="-128" max="127" step="1" [(value)]="rStickHor"></mat-slider>
@@ -19,8 +33,8 @@
       class="example-box"
       cdkDragBoundary=".example-boundary"
       cdkDrag
-      (cdkDragStarted)="isDragging = true;"
-      (cdkDragEnded)="isDragging = false;"
+      (cdkDragStarted)="isDragging = true"
+      (cdkDragEnded)="isDragging = false"
       (cdkDragMoved)="dragMoved($event)"
       [cdkDragFreeDragPosition]="dragPosition"
     >

@@ -1,5 +1,6 @@
 :host {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -7,6 +8,10 @@
 
   .picker {
     width: 300px;
+  }
+
+  .instruction {
+    text-align: center;
   }
 
   .counter {
