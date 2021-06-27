@@ -2,25 +2,10 @@
 import { Component, OnInit } from '@angular/core';
 
 import * as struct from 'python-struct';
-import { Buffer } from 'buffer';
 import { Observable, Subscription, timer } from 'rxjs';
 
 // Format "bbbbBBiiB", l_stick_hor, l_stick_ver, r_stick_hor, r_stick_ver, l_trigger, r_trigger, setting1, setting2, buttons_char
 
-struct.sizeOf('bbbbBBiiB'); // --> 29
-
-const panic = struct.pack('bbbbBBiiB', [0, 0, 0, 0, 0, 0, 0, 0, 0]);
-//const test = struct.pack('bbbbBBiiB', [-128, 127, -128, 127, 255, 255, 0, 0, 255]);
-const test = struct.pack('bbbbBBiiB', [127, 0, -127, 0, 0, 0, 0, 0, 0]);
-
-console.log(test);
-struct.unpack(
-  'bbbbBBiiB',
-  Buffer.from(
-    '000004d20000162e0000ab54a98ceb1f0ad26162636465666700000001',
-    'hex'
-  )
-); // --> [ 1234, 5678, 12345678901234567890, 'abcdefg', 1 ]
 
 @Component({
   selector: 'app-root',
@@ -41,7 +26,6 @@ export class AppComponent implements OnInit {
   timerSource: Observable<number> | null = null;
   timerSubscription: Subscription | null = null;
   myCharacteristic: any;
-  backgroundColor = '';
   value = '0';
   dragPosition = { x: 0, y: 0 };
   isDragging = false;
@@ -50,8 +34,14 @@ export class AppComponent implements OnInit {
     this.timerSource = timer(1000, 200);
     this.timerSubscription = this.timerSource.subscribe((val) => {
       if (this.isDragging === false) {
-        this.lStickHor = Math.round((this.lStickHor ?? 0 + 127) / 1.5);
-        this.rStickVer = Math.round((this.rStickVer ?? 0 + 9) / 1.5);
+        this.lStickHor = Math.ceil((this.lStickHor ?? 0 + 127) / 1.5);
+        this.rStickVer = Math.ceil((this.rStickVer ?? 0 + 127) / 1.5);
+        if(this.lStickHor > 0 && this.lStickHor < 5){
+          this.lStickHor = 0;
+        }
+        if(this.rStickVer > 0 && this.rStickVer < 5){
+          this.rStickVer = 0;
+        }
         this.dragPosition = {
           x: this.lStickHor + 127,
           y: -this.rStickVer + 127,
@@ -138,12 +128,8 @@ export class AppComponent implements OnInit {
       }, ms);
     });
   }
-  async buttonOn() {
-    await this.myCharacteristic.writeValue(test);
-  }
 
   async buttonOff() {
-    // await this.myCharacteristic.writeValue(panic);
     this.lStickHor = 0;
     this.lStickVer = 0;
     this.rStickHor = 0;
@@ -155,23 +141,12 @@ export class AppComponent implements OnInit {
     this.buttonsChar = 0;
   }
 
-  async buttonReset() {
-    const encoder = new TextEncoder();
-    const text = 'reset';
-    this.value = '0';
-    await this.myCharacteristic.writeValue(encoder.encode(text));
-  }
 
   async sendBle(message: string) {
     console.log(message);
     const encoder = new TextEncoder();
     const text = message;
     await this.myCharacteristic.writeValue(encoder.encode(text));
-  }
-
-  backgroundColorChange(e: any) {
-    console.log(e);
-    this.sendBle('0X' + e.color.hex.substring(1).toUpperCase());
   }
 
   async updateRobot() {
