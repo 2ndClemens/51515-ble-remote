@@ -2,7 +2,7 @@
   Connect
 </button>
 <!--*ngIf="device?.gatt?.connected"-->
-<div >
+<div>
   <button mat-raised-button color="primary" (click)="buttonOn()">On</button>
   <button mat-raised-button color="primary" (click)="buttonOff()">Off</button>
   <button mat-raised-button color="primary" (click)="buttonReset()">
@@ -18,9 +18,16 @@
   <mat-slider min="0" max="25500000" step="1" [(value)]="setting2"></mat-slider>
   <mat-slider min="0" max="255" step="1" [(value)]="buttonsChar"></mat-slider>
   <div class="example-boundary">
-    <div class="example-box" cdkDragBoundary=".example-boundary" cdkDrag
-    (cdkDragMoved)="dragMoved($event)">
-      {{dragPosition | json}}
+    <div
+      class="example-box"
+      cdkDragBoundary=".example-boundary"
+      cdkDrag
+      (cdkDragStarted)="isDragging = true;"
+      (cdkDragEnded)="isDragging = false;"
+      (cdkDragMoved)="dragMoved($event)"
+      [cdkDragFreeDragPosition]="dragPosition"
+    >
+      {{ dragPosition | json }} {{ isDragging }}
     </div>
   </div>
   <div class="counter">{{ value }}</div>

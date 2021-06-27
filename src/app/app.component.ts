@@ -44,12 +44,21 @@ export class AppComponent implements OnInit {
   backgroundColor = '';
   value = '0';
   dragPosition = { x: 0, y: 0 };
+  isDragging = false;
 
   ngOnInit() {
     this.timerSource = timer(1000, 200);
-    this.timerSubscription = this.timerSource.subscribe((val) =>
-      this.updateRobot()
-    );
+    this.timerSubscription = this.timerSource.subscribe((val) => {
+      if (this.isDragging === false) {
+        this.lStickHor = Math.round((this.lStickHor ?? 0 + 127) / 1.5);
+        this.rStickVer = Math.round((this.rStickVer ?? 0 + 9) / 1.5);
+        this.dragPosition = {
+          x: this.lStickHor + 127,
+          y: -this.rStickVer + 127,
+        };
+      }
+      this.updateRobot();
+    });
   }
 
   async onButtonClick() {
@@ -134,7 +143,7 @@ export class AppComponent implements OnInit {
   }
 
   async buttonOff() {
-    await this.myCharacteristic.writeValue(panic);
+    // await this.myCharacteristic.writeValue(panic);
     this.lStickHor = 0;
     this.lStickVer = 0;
     this.rStickHor = 0;
@@ -180,11 +189,13 @@ export class AppComponent implements OnInit {
       this.setting2 ?? 0,
       this.buttonsChar ?? 0,
     ]);
-    await this.myCharacteristic?.writeValue(sendData);
+    if (this.device?.gatt?.connected) {
+      await this.myCharacteristic?.writeValue(sendData);
+    }
   }
   dragMoved(e: any) {
-    console.log(e.source.getFreeDragPosition());
-    this.dragPosition = e.source.getFreeDragPosition();
+    // console.log(e.source.getFreeDragPosition());
+    //  this.dragPosition = e.source.getFreeDragPosition();
     const position = e.source.getFreeDragPosition();
     this.lStickHor = position.x - 124;
     this.rStickVer = -position.y + 124;
