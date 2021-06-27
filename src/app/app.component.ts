@@ -1,40 +1,21 @@
 /// <reference types="web-bluetooth" />
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import * as struct from 'python-struct';
 import { Buffer } from 'buffer';
+import { Observable, Subscription, timer } from 'rxjs';
 
-struct.sizeOf('>iixxQ10sb'); // --> 29
+// Format "bbbbBBiiB", l_stick_hor, l_stick_ver, r_stick_hor, r_stick_ver, l_trigger, r_trigger, setting1, setting2, buttons_char
 
-struct.pack('>iixxQ10sb', [
-  1234,
-  5678,
-  require('long').fromString('12345678901234567890'),
-  'abcdefg',
-  true,
-]); // --> <Buffer 00 00 04 d2 00 00 16 2e 00 00 ab 54 a9 8c eb 1f 0a d2 61 62 63 64 65 66 67 00 00 00 01>
+struct.sizeOf('bbbbBBiiB'); // --> 29
 
-struct.unpack(
-  '>iixxQ10sb',
-  Buffer.from(
-    '000004d20000162e0000ab54a98ceb1f0ad26162636465666700000001',
-    'hex'
-  )
-); // --> [ 1234, 5678, 12345678901234567890, 'abcdefg', 1 ]
-
-struct.sizeOf('>iixxQ10sb'); // --> 29
-
-const test = struct.pack('>iixxQ10sb', [
-  1234,
-  5678,
-  require('long').fromString('12345678901234567890'),
-  'abcdefg',
-  true,
-]); // --> <Buffer 00 00 04 d2 00 00 16 2e 00 00 ab 54 a9 8c eb 1f 0a d2 61 62 63 64 65 66 67 00 00 00 01>
+const panic = struct.pack('bbbbBBiiB', [0, 0, 0, 0, 0, 0, 0, 0, 0]);
+//const test = struct.pack('bbbbBBiiB', [-128, 127, -128, 127, 255, 255, 0, 0, 255]);
+const test = struct.pack('bbbbBBiiB', [127, 0, -127, 0, 0, 0, 0, 0, 0]);
 
 console.log(test);
 struct.unpack(
-  '>iixxQ10sb',
+  'bbbbBBiiB',
   Buffer.from(
     '000004d20000162e0000ab54a98ceb1f0ad26162636465666700000001',
     'hex'
@@ -46,25 +27,45 @@ struct.unpack(
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  lStickHor: number | null = 0;
+  lStickVer: number | null = 0;
+  rStickHor: number | null = 0;
+  rStickVer: number | null = 0;
+  lTrigger: number | null = 0;
+  rTrigger: number | null = 0;
+  setting1: number | null = 0;
+  setting2: number | null = 0;
+  buttonsChar: number | null = 0;
+  device: BluetoothDevice | null = null;
+  timerSource: Observable<number> | null = null;
+  timerSubscription: Subscription | null = null;
   myCharacteristic: any;
   backgroundColor = '';
   value = '0';
+  dragPosition = { x: 0, y: 0 };
+
+  ngOnInit() {
+    this.timerSource = timer(1000, 200);
+    this.timerSubscription = this.timerSource.subscribe((val) =>
+      this.updateRobot()
+    );
+  }
 
   async onButtonClick() {
     let serviceUuid = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
-    let characteristicUuidTx = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
-    let characteristicUuidRx = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
-    let device = null;
+    let characteristicUuidTx = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+    let characteristicUuidRx = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+    this.device = null;
 
     try {
       console.log('Requesting Bluetooth Device...');
-      device = await navigator.bluetooth.requestDevice({
+      this.device = await navigator.bluetooth.requestDevice({
         filters: [{ services: [serviceUuid] }, { name: 'robot' }],
       });
 
       console.log('Connecting to GATT Server...');
-      const server = await device.gatt?.connect();
+      const server = await this.device.gatt?.connect();
 
       console.log('Getting Service...');
       const service = await server?.getPrimaryService(serviceUuid);
@@ -129,15 +130,20 @@ export class AppComponent {
     });
   }
   async buttonOn() {
-    const encoder = new TextEncoder();
-    const text = 'on';
-    await this.myCharacteristic.writeValue(encoder.encode(text));
+    await this.myCharacteristic.writeValue(test);
   }
 
   async buttonOff() {
-    const encoder = new TextEncoder();
-    const text = 'off';
-    await this.myCharacteristic.writeValue(encoder.encode(text));
+    await this.myCharacteristic.writeValue(panic);
+    this.lStickHor = 0;
+    this.lStickVer = 0;
+    this.rStickHor = 0;
+    this.rStickVer = 0;
+    this.lTrigger = 0;
+    this.rTrigger = 0;
+    this.setting1 = 0;
+    this.setting2 = 0;
+    this.buttonsChar = 0;
   }
 
   async buttonReset() {
@@ -157,5 +163,30 @@ export class AppComponent {
   backgroundColorChange(e: any) {
     console.log(e);
     this.sendBle('0X' + e.color.hex.substring(1).toUpperCase());
+  }
+
+  async updateRobot() {
+    // Format "bbbbBBiiB", l_stick_hor, l_stick_ver, r_stick_hor, r_stick_ver, l_trigger, r_trigger, setting1, setting2, buttons_char
+    struct.sizeOf('bbbbBBiiB'); // --> 29
+
+    const sendData = struct.pack('bbbbBBiiB', [
+      this.lStickHor ?? 0,
+      this.lStickVer ?? 0,
+      this.rStickHor ?? 0,
+      this.rStickVer ?? 0,
+      this.lTrigger ?? 0,
+      this.rTrigger ?? 0,
+      this.setting1 ?? 0,
+      this.setting2 ?? 0,
+      this.buttonsChar ?? 0,
+    ]);
+    await this.myCharacteristic?.writeValue(sendData);
+  }
+  dragMoved(e: any) {
+    console.log(e.source.getFreeDragPosition());
+    this.dragPosition = e.source.getFreeDragPosition();
+    const position = e.source.getFreeDragPosition();
+    this.lStickHor = position.x - 124;
+    this.rStickVer = -position.y + 124;
   }
 }

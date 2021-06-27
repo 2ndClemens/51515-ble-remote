@@ -1,13 +1,33 @@
 <button mat-raised-button color="primary" (click)="onButtonClick()">
   Connect
 </button>
-<button mat-raised-button color="primary" (click)="buttonOn()">On</button>
-<button mat-raised-button color="primary" (click)="buttonOff()">Off</button>
-<button mat-raised-button color="primary" (click)="buttonReset()">Reset</button>
-<div class="counter">{{ value }}</div>
-<div class="picker">
-  <color-sketch
-    [color]="backgroundColor"
-    (onChange)="backgroundColorChange($event)"
-  ></color-sketch>
+<!--*ngIf="device?.gatt?.connected"-->
+<div >
+  <button mat-raised-button color="primary" (click)="buttonOn()">On</button>
+  <button mat-raised-button color="primary" (click)="buttonOff()">Off</button>
+  <button mat-raised-button color="primary" (click)="buttonReset()">
+    Reset
+  </button>
+  <mat-slider min="-128" max="127" step="1" [(value)]="lStickHor"></mat-slider>
+  <mat-slider min="-128" max="127" step="1" [(value)]="lStickVer"></mat-slider>
+  <mat-slider min="-128" max="127" step="1" [(value)]="rStickHor"></mat-slider>
+  <mat-slider min="-128" max="127" step="1" [(value)]="rStickVer"></mat-slider>
+  <mat-slider min="0" max="255" step="1" [(value)]="lTrigger"></mat-slider>
+  <mat-slider min="0" max="255" step="1" [(value)]="rTrigger"></mat-slider>
+  <mat-slider min="0" max="25500000" step="1" [(value)]="setting1"></mat-slider>
+  <mat-slider min="0" max="25500000" step="1" [(value)]="setting2"></mat-slider>
+  <mat-slider min="0" max="255" step="1" [(value)]="buttonsChar"></mat-slider>
+  <div class="example-boundary">
+    <div class="example-box" cdkDragBoundary=".example-boundary" cdkDrag
+    (cdkDragMoved)="dragMoved($event)">
+      {{dragPosition | json}}
+    </div>
+  </div>
+  <div class="counter">{{ value }}</div>
+  <div class="picker">
+    <color-sketch
+      [color]="backgroundColor"
+      (onChange)="backgroundColorChange($event)"
+    ></color-sketch>
+  </div>
 </div>
